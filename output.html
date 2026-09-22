@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Hover Example</title>
+<style>
+  .button-container {
+    position: relative;
+    display: inline-block;
+  }
+
+  .button-container .hidden-buttons {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 100%;
+  }
+
+  .button-container:hover .hidden-buttons {
+    display: block;
+  }
+
+  .hidden-buttons button {
+    display: block;
+    margin: 2px 0; /* Space out buttons */
+  }
+</style>
+</head>
+<body>
+
+<div class="button-container">
+  <!-- Main button to hover over -->
+  <button>Main Button</button>
+  
+  <!-- Hidden buttons that will appear on hover -->
+  <div class="hidden-buttons">
+    <button>Button 1</button>
+    <button>Button 2</button>
+    <button>Button 3</button>
+  </div>
+</div>
+
+</body>
+</html>

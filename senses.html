@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Example Page</title>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=width-device, initial-scale=1.0">
+    <title>Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <script src="../glosStatus.js"></script>
+  
+
+    <style>
+        
+        #listSense {
+    max-width: 150px; /* Set a max-width to truncate longer text */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis; /* This will add '...' at the end of truncated text */
+}
+</style>
+</head>
+<body>
+
+  
+    <div id="senses">
+        </div>
+        
+        <select id="listSense">
+            <option value=""></option>
+        </select>
+        <input type="text" id="newSense" class="newSense"></input>
+
+        <button onclick="addSense()">Versturen</button>
+ 
+</body>
+</html>
+
+<script>
+
+
+function addSense() {
+    var listSense = document.getElementById("listSense");
+    var newSense = document.getElementById("newSense").value;
+
+    //determine if there is a selectedSense value
+    if(listSense.options[listSense.selectedIndex])
+    {
+        var selectedSense = listSense.options[listSense.selectedIndex].value;
+    }
+    else
+    {
+        var selectedSense = "";
+    }
+
+
+    //then check if selectedSense value is equal to nieuweSense or an existing sense
+    if (selectedSense == "") {
+        //if selectedSense is equal to nieuweSense then add newSense to listSense
+        var option = document.createElement("option");
+    option.value = newSense;
+    option.text = newSense;
+    listSense.appendChild(option);
+
+    } else {
+        //if selectedSense is equal to an existing sense then add the selectedSense value to newSense
+        listSense.options[listSense.selectedIndex].value = newSense;
+        listSense.options[listSense.selectedIndex].text = newSense;
+    }
+    document.getElementById("newSense").value = "";
+  
+        //forloop listSense check if there is empty value in listSense
+        for (var i = 0; i < listSense.length; i++) {
+            if(listSense.options[i].value == "")
+            {
+                listSense.options[i].remove();
+                i--; // Decrement i as the list length decreases
+            }
+        }
+        //then add a empty option value to listSense
+        var option = document.createElement("option");
+        option.value = "";
+        option.text = "";
+        listSense.appendChild(option);
+
+
+
+
+    var senses = [];
+    //convert from listSenses to senses array
+    for (var ia = 0; ia < listSense.length; ia++) {
+        if(listSense.options[ia].value != "")
+        {
+            senses.push(listSense.options[ia].value);
+
+        }
+    
+    }
+    console.log(senses)
+
+    var updateData = {
+      id: "1",
+      senses: senses
+    };
+    updateData = JSON.stringify(updateData);
+
+    $.post("../update_field.php", { updatedData: updateData }, function (data, status) {
+      console.log("Data: " + data + "\nStatus: " + status);
+    });
+  
+}
+
+function generateSense(senses){
+    //for loop senses array and then input the value in listSense
+    var listSense = document.getElementById("listSense");
+    console.log(senses)
+    senses = JSON.parse(senses);
+
+    for (var i = 0; i < senses.length; i++) {
+        var option = document.createElement("option");
+        option.value = senses[i];
+        option.text = senses[i];
+        listSense.appendChild(option);
+    }
+    //when onclick on option then fill the newSense input with the value of the selected option
+    listSense.onclick = function() {
+        var selectedSense = listSense.options[listSense.selectedIndex].value;
+        document.getElementById("newSense").value = selectedSense;
+    }
+
+
+}
+      function fetchSingleRow(id) {
+    return new Promise(function (resolve, reject) {
+      $.ajax({
+        type: "GET",
+        url: "../fetch_form.php?id=" + id, // Replace with the actual URL of your PHP script
+        dataType: "json",
+        success: function (data) {
+          var output = {
+            logboek: data.logboek,
+            actie: data.actie,
+            zelfopname: data.zelfopname,
+            wie: data.wie,
+            control_nodig: data.control_nodig,
+            glos: data.glos,
+            glosZichtbaar: data.glosZichtbaar,
+            Handeness: data.Handeness,
+            strongHand: data.strongHand,
+            weakHand: data.weakHand,
+            HandshapeChange: data.HandshapeChange,
+            handLocation: data.handLocation,
+            RelationArticulators: data.RelationArticulators,
+            relOrientationMove: data.relOrientationMove,
+            relOrientationLoc: data.relOrientationLoc,
+            orientationChange: data.orientationChange,
+            ContactType: data.ContactType,
+            MovementShape: data.MovementShape,
+            MovementDirection: data.MovementDirection,
+            RepeatedMovement: data.RepeatedMovement,
+            AlternatingMovement: data.AlternatingMovement,
+            fonologie_fase1: data.fonologie_fase1,
+            senses: data.senses
+
+
+          };
+
+          resolve(output);
+        },
+        error: function (xhr, status, error) {
+          reject(error.toString()); // Convert the error to text
+        }
+      });
+    });
+  }
+
+
+  fetchSingleRow(1)
+    .then(function (data) {
+      console.log(data);
+      generateSense(data.senses);
+    })
+    .catch(function (error) {
+      console.error(error);
+    });
+
+
+  </script>

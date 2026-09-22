@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Web Page</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Welcome to My Web Page</h1>
+    <p>This is a basic HTML document.</p>
+</body>
+</html>
+
+<script>
+
+
+
+function exportLevelSequenceName(unreal_takea, glosName){
+
+  unreal_takea = unreal_takea.replace("LevelSequence ", "");
+  //remove scene after .
+  var unreal_take = unreal_takea.split(".")[0];
+
+  //get SceneNumber from unreal_take
+  var SceneNumber = unreal_takea.split(".")[1];
+
+  var extraField = unreal_take.split('/').pop();
+  // unreal_take = unreal_take+"_Subscenes/GlassesGuyRecord_"+SceneNumber+".GlassesGuyRecord_"+extraField
+
+  unreal_take = unreal_take+"_Subscenes/Animation/GlassesGuyRecord_"+SceneNumber+".GlassesGuyRecord_"+SceneNumber
+  
+  console.log(unreal_take)
+  console.log("exportLevelSequenceName")
+  socket.send(JSON.stringify({
+        handler: "fbxExportName",
+        data: unreal_take,
+        glosName: glosName
+    }));
+}
+
+
+
+const socket = new WebSocket('wss://leffe.science.uva.nl:8043/unrealServer/');
+
+var isCapturing = false;
+
+
+// Event listener for WebSocket connection open
+socket.addEventListener('open', (event) => {
+    console.log('WebSocket connection opened');
+
+    //send an json array to server
+    socket.send(JSON.stringify({
+        handler: "greet",
+        data: "Hello from the client!"
+    }));
+    //change background color
+    document.body.style.backgroundColor = "white";
+    //activate ophalenData
+    // setInterval(ping, 1000); // 1000 milliseconds = 1 second
+    ophalenData()
+
+});
+
+
+// Event listener for WebSocket messages
+socket.addEventListener('message', (event) => {
+    console.log('Message from server:', event.data);
+
+    var data = JSON.parse(event.data);
+
+
+    if(data.handler == "glosName")
+    {
+      console.log(data.handler)
+
+      //save the glosName to database
+      getunrealtake = data.glosName;
+      updateData(data.glosName)
+
+    }
+
+});
+
+
+
+function ophalenData() {
+
+    var thema = "oline_asl"
+
+
+fetch(`../fetch_all.php?limit=1&offset=0&thema=${thema}&handle=themaFilter`)
+  .then(response => response.json())
+  .then(data => {
+    console.log(data)
+
+    var i = 0;
+    data.forEach(item => {
+        i++;
+
+
+
+if(item.unreal_take)
+{ 
+    exportLevelSequenceName(item.unreal_take, item.glos)
+        
+    
+}
+
+  })
+ 
+  camerasReconnectStartupRunning = 0;
+
+}) .catch(error => {
+    // Handle any errors that may occur during the fetch
+    console.error('Error:', error);
+  });}
+
+
+
+</script>

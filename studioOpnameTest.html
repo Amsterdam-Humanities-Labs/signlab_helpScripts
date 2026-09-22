@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Studio Opname Test</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+
+    <style>
+            .output_canvas {
+      z-index: 1000;
+      width: 100%;
+      height: 100%;
+    }
+    #webcam{
+        z-index: 1001;
+    }
+
+    </style>
+</head>
+<body>
+
+    <canvas class="output_canvas" id="output_canvas" style="position: absolute; left: 0px; top: 0px;"></canvas>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6">
+                <h1>Studio Opname Test</h1>
+                <button id="selectUsersButton" class="btn btn-primary">Select User</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="selectUsers" class="modal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Select User</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <select id="selectUsersMenu" class="form-control">
+                        <option value="1">User 1</option>
+                        <option value="2">User 2</option>
+                        <option value="3">User 3</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="videoRow" class="row" style="display: none;">
+        <div class="col-md-6">
+            <h2 id="woordId"></h2>
+            <video id="signbankVideo" controls></video>
+        </div>
+    </div>
+
+    <div class="container-fluid" id="videoContainer">
+        asdasd
+        <div class="row">
+          <div class="col-md-4">
+            <video id="myVideo3" width="100%" controls autoplay loop muted="muted">
+          </div>
+          <div class="col-md-4">
+            <video id="myVideo1" width="100%" controls autoplay loop muted="muted">
+          </div>
+          <div class="col-md-4">
+            <video id="myVideo2" width="100%" controls autoplay loop muted="muted">
+          </div>
+        </div>
+      </div>
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <video id="webcam" autoplay="" preload="" muted="" loop="" playsinline="">
+
+
+      
+</body>
+</html>
+
+
+
+<script>
+
+
+
+    var webcamCaptureActive = false;
+    var webcamRunning = false;
+    const webcamElement = document.getElementById("webcam");
+    var mediaRecorder;
+    let chunks = [];
+    var videoNumber;
+    var  userId = "10";
+    var zelfopname;
+
+ophalenData(userId)
+
+window.onload = function () {
+    enableCam();
+  }
+
+
+
+function ophalenData(userId) {
+
+//     $("#selectUsers").modal('hide');
+
+//   userId = $("#selectUsersMenu").val();//FUCKING STRING IN PLAATS VAN INTEGER
+
+
+//   thema = $("#selectThemaMenu").val();//FUCKING STRING IN PLAATS VAN INTEGER
+
+var thema = "eten en drinken"
+
+
+
+    var stopLoop = false
+
+    fetch(`../fetch_all.php?limit=500&offset=0&thema=${thema}&handle=themaFilter`)
+      .then(response => response.json())
+      .then(data => {
+
+        var i = 0;
+        data.forEach(item => {
+            i++;
+          if(!stopLoop)
+          {
+          try {
+          var videoTop = JSON.parse(item.videoTop);
+
+          if (!Array.isArray(videoTop)) {
+          videoTop = [];
+          }
+          // No need for else block to re-parse item.videoCenter
+          } catch (error) {
+          videoTop = []; // Ensure videoCenter is an array even in case of error
+          }
+          
+          // Process each element in the 'data' array here
+          //check if userid is in studopopnamewie
+        //   console.log(userId)
+
+            //now check if user already has made captures before in item.videoCenter
+            console.log(userId)
+
+             let useridExists = videoTop.some(item => item.userid === userId);
+
+            if(!useridExists)
+            {
+              //tonen glos
+
+                  $("#woordId").text(item.glos)
+              //tonen zelfopname uit array
+              //checken of het wel array is
+            //   console.log("zelfopname")
+              //first check if there is signbank opname TEMP
+              if(item.zelfopname == "" || item.zelfopname == "[]")
+              {
+                zelfopname = item.glos+".mp4"
+                // console.log(zelfopname +"van signbank")
+              }
+              else
+              {
+              
+              try{
+             zelfopname = JSON.parse(item.zelfopname);
+              if(!Array.isArray(zelfopname))
+              {
+                // eslint-disable-next-line no-self-assign
+                zelfopname = zelfopname;
+              }
+              else
+              {
+                if(zelfopname != "")
+                {
+                    // console.log(zelfopname)
+                //pakt eerste zelfopname voorlopig: TODO: mogelijkheid om verschillende zelfopnaes te tonen
+                zelfopname = zelfopname[0];
+                }
+                else{
+                    zelfopname = item.glos+".mp4"
+                }
+
+              }
+              }
+              catch (error) {
+                zelfopname = [""];
+                //skip to next item
+        //   stopLoop = false
+            } 
+          }
+                  $("#videoContainer").hide();
+            $("#officeVideoDiv").hide();
+              $("#videoRow").show();
+
+            //tonen zelfopname in videoelement
+            var videoElement = document.getElementById('signbankVideo');
+
+            // Set the new src attribute
+            videoElement.src = "../uploads/"+zelfopname;
+
+            // Load the new video source
+            videoElement.load();
+
+            // Play the video
+            videoElement.play(); //tijdelijk
+
+            //voor update array
+          glos = item.id;
+          stopLoop = true
+          }
+
+
+
+        
+    
+      }      
+
+      })
+     
+      camerasReconnectStartupRunning = 0;
+
+  }) .catch(error => {
+        // Handle any errors that may occur during the fetch
+        console.error('Error:', error);
+      });}
+
+
+      
+      
+document.addEventListener('keydown', function(event) {
+  if (event.key === 'b') {
+    webcamCaptureActive = !webcamCaptureActive;
+    if (webcamCaptureActive) {
+      startWebcamCapture(glos);
+    } else {
+        mediaRecorder.stop();
+    }
+  }
+});
+
+   // eslint-disable-next-line no-unused-vars
+   function enableCam(event) {
+    if (webcamRunning === true) {
+      webcamRunning = false;
+    } else {
+      webcamRunning = true;
+    }
+
+    const constraints = {
+      video: true
+    };
+
+      navigator.mediaDevices.getUserMedia(constraints).then(function (stream) {
+      webcamElement.srcObject = stream;
+
+    });
+
+  }
+
+      
+
+
+
+
+
+
+ function startWebcamCapture(glos) {
+
+
+    $("#output_canvas").css("background-color", "red")
+        $(".floating-div").show();       
+
+
+const options = {
+      audioBitsPerSecond: 128000,
+      videoBitsPerSecond: 2500000,
+      mimeType: "video/webm",
+    };
+
+   mediaRecorder = new MediaRecorder(webcamElement.srcObject, options );
+
+    mediaRecorder.ondataavailable = function (event) {
+        chunks.push(event.data);
+      
+    };
+
+      mediaRecorder.onstop = function () {
+      //send stop command to sony cameras
+      const blob = new Blob(chunks, { type: "video/webm" });
+    //   userId = $("#selectUsersMenu").val();//FUCKING STRING IN PLAATS VAN INTEGER
+
+      videoNumber = videoNumber++;
+
+      stopTime = new Date().toISOString();
+      //prepare form array for fetch
+      var formData = new FormData();
+      formData.append("glos", glos);
+      formData.append("startTime", startTime);
+      formData.append("stopTime", stopTime);
+      formData.append("videoNumber", videoNumber);
+      formData.append("userid", userId); //TODO fix
+      formData.append("video", blob);
+
+        //convert formData to array
+        var object = {};
+formData.forEach((value, key) => object[key] = value);
+
+// Stringify the object
+var formDataJSON = JSON.stringify(object);
+console.log(formDataJSON);
+
+      fetch('../save_video_studio.php?formdata=' + formData, {
+        method: 'POST',
+        body: formData,
+      }).then(response => response.json())
+        .then(data => {
+          console.log(data)
+          if (data.success) {
+            console.log(data)
+
+
+          } else {
+            console.log(data.error)
+          }
+        }).catch(function (error) {
+          console.log(blob)
+          console.log(glos)
+          console.error('Error:', error);
+        });
+        startDisplayingWebcam(blob);
+
+      chunks = [];
+    };
+  
+
+    startTime = new Date().toISOString();
+    console.log(startTime)
+    //send capture command to sony cameras
+    mediaRecorder.start();
+
+}
+
+
+
+
+
+
+function startDisplayingWebcam(blob) {
+        console.log(blob);
+        let myVideo1;
+        let myVideo2;
+        $("#videoContainer").show();
+        $("#myVideo1").show();
+        $("#myVideo2").show();
+        $("#myVideo3").hide();
+
+        myVideo1 = document.getElementById('myVideo1');
+        myVideo1.style.width = '100%';
+        myVideo1.style.position = 'fixed';  // Changed to 'fixed'
+        myVideo1.style.left = '0';
+        myVideo1.style.top = '0';
+
+
+
+        myVideo1.src = URL.createObjectURL(blob); // Set the src attribute to the URL created from the blob
+        myVideo1.load();
+        myVideo1.addEventListener('loadedmetadata', function () {
+          myVideo1.play();
+        });
+         myVideo2 = document.getElementById('myVideo2');
+        myVideo2.style.width = '100%';
+        myVideo2.src =  "../uploads/"+zelfopname; // Set the src attribute to the URL created from the blob
+        myVideo2.load();
+        myVideo2.addEventListener('loadedmetadata', function () {
+          myVideo2.play();
+        });
+      }
+
+
+
+</script>
