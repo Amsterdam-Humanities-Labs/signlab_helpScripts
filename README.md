@@ -2,7 +2,7 @@
 Helper scripts from the core server's `/web/helpScripts`: a few live endpoints and jobs, and many one-off tools.
 
 ## What it does
-- Live endpoints: `emptyVideoTop.php` (clear recorded-take markers for a user and theme; called by the studio pages in [signlab_studio_beta](https://github.com/Amsterdam-Humanities-Labs/signlab_studio_beta)), `updateVideoRow.php`, `deleteVideoRow.php`, `fetchVideoTop.php` (video rows in `CameraRecords` and `matched_transcriptions`).
+- Live endpoints: `emptyVideoTop.php` (clear recorded-take markers for a user and theme; called by the studio pages in [signlab_camera-control](https://github.com/Amsterdam-Humanities-Labs/signlab_camera-control)), `updateVideoRow.php`, `deleteVideoRow.php`, `fetchVideoTop.php` (video rows in `CameraRecords` and `matched_transcriptions`).
 - Server jobs: `convert.py` (FFmpeg transcode to `studioFilesMini`, thumbnails), `mysqlBackup.php` (hourly backups, 14-day hourly and 1-year daily retention), `zinBackup.py` (ZIP of sentence EAF/SRT files), `check_studiofiles.py` (move misfiled raw videos).
 - Signbank tools: `signBankCSVDownloader.py` (download the gloss package, convert it to JSON), `signbankGlosExists.py`, `sensesChecker.py`, `fonoChecker.py`, `glosSyntaxChecker.py`, `signbank/` (inspect and convert `glosses.json`).
 - Phonology (fono) tools: `createFonoArray.py`, `panono.py`, `translateFono.py`. They read the saved Signbank lists in `*NL.html` / `*EN.html`.
