@@ -1,9 +1,10 @@
+import os
 import requests
 import json
 from bs4 import BeautifulSoup
 
 headers = {
-    "Authorization": "Bearer UlerhGrfFpU03RD3",
+    "Authorization": 'Bearer ' + os.environ.get('SIGNBANK_API_KEY', ''),
 }
 
 url = "https://signbank.cls.ru.nl/dictionary/api_update_gloss/5/45834/"

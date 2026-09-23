@@ -30,7 +30,7 @@ cookies = {
     }
 
 headers = {
-        "Authorization": "Bearer UlerhGrfFpU03RD3",
+        "Authorization": 'Bearer ' + os.environ.get('SIGNBANK_API_KEY', ''),
     }
     
 def download_signbank_json():
