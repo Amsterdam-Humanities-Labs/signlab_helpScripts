@@ -118,7 +118,7 @@ def obtain_gloss_info(gloss_id):
     url = f"https://signbank.cls.ru.nl/dictionary/get_gloss_data/5/{gloss_id}"
     
     headers = {
-        "Authorization": "Bearer UlerhGrfFpU03RD3",
+        "Authorization": 'Bearer ' + os.environ.get('SIGNBANK_API_KEY', ''),
     }
     
     try:
@@ -165,7 +165,7 @@ def obtain_nme_video_array(gloss_id):
     url = f"https://signbank.cls.ru.nl/dictionary/get_gloss_data/5/{gloss_id}"
     
     headers = {
-        "Authorization": "Bearer UlerhGrfFpU03RD3",
+        "Authorization": 'Bearer ' + os.environ.get('SIGNBANK_API_KEY', ''),
     }
     
     try:
@@ -236,7 +236,7 @@ def remove_gloss_video(gloss_id, videoid):
     url = f"https://signbank.cls.ru.nl/dictionary/api_delete_gloss_nmevideo/5/{gloss_id}/{videoid}/"
     
     headers = {
-        "Authorization": "Bearer UlerhGrfFpU03RD3",
+        "Authorization": 'Bearer ' + os.environ.get('SIGNBANK_API_KEY', ''),
     }
     
     try:
