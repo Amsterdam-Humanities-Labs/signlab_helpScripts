@@ -34,3 +34,10 @@ cd /web/helpScripts && python3 signBankCSVDownloader.py
 - MySQL database `admin_gebarenoverleg`; Signbank (`signbank.cls.ru.nl`); FFmpeg; Blender for the Blender scripts.
 - Services on `leffe.science.uva.nl:8043` (`signBankAPI`, `fbx2glb`, `autoUpdater.php`).
 - `convert.py` imports `renderServer.video_api_client`, which is not in this repo.
+
+## License and citation
+
+Apache License 2.0, copyright University of Amsterdam: see [LICENSE](LICENSE) and
+[NOTICE](NOTICE). You may use it, also commercially, as long as you credit
+Gomer Otterspeer / University of Amsterdam as the source. To cite it, use
+[CITATION.cff](CITATION.cff) (the *Cite this repository* button on GitHub) or the DOI [10.21942/uva.33980335](https://doi.org/10.21942/uva.33980335).
